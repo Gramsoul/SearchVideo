@@ -1,0 +1,7 @@
+<section th:fragment="searchSection">
+    <form th:action="@{/response}" method="POST">
+      <label>Buscar video: </label>
+      <input type="text" name="urlVideo" id="urlVideo"/>
+      <input type="submit" value="Search"/>
+    </form>
+</section>

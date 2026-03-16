@@ -1,0 +1,14 @@
+<section th:fragment="response">
+    <div>
+        <img th:src="${thumbnail}" alt="thumbnail del video"/>
+        <form th:action="@{/download}" method="POST">
+            <input type="hidden" name="urlDownload" th:value="${urlDownload}">
+            <button type="submit" >Download</button>
+        </form>
+    </div>
+    <div>
+        <h2 th:text="${fulltitle}">Titulo</h2>
+        <h3 th:text="${uploader}">uploader</h3>
+        <p th:text="${description}">description</p>
+    </div>
+</section>
