@@ -11,37 +11,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class searchController {
+    private final DLP dlp;
 
-
-    @GetMapping("/")
-    public String index(Model model){
-       model.addAttribute("contenido", "form :: searchSection");
-       return "layout";
+    public searchController(DLP dlp){
+        this.dlp = dlp;
     }
 
     @PostMapping("/response")
-    public String searchResponse(@RequestParam String urlVideo, Model model){
-        System.out.println("url buscada: "+urlVideo);
-
-        VideoInfo data = Info.obtainData(urlVideo);
-        model.addAttribute("urlDownload", data.webpageUrl);
-        model.addAttribute("thumbnail", data.thumbnail);
-        model.addAttribute("fulltitle", data.fulltitle);
-        model.addAttribute("uploader", data.uploader);
-        model.addAttribute("description", data.description);
-
-        model.addAttribute("contenido", "response :: response");
-
-        return "layout";
+    public String searchResponse(@RequestParam String videoUrl){
+        return dlp.info(videoUrl);
     }
-    @PostMapping("/download")
-    public String executeDownload(@RequestParam("urlDownload") String urlDownload ,Model model){
-        DLP dlp = new DLP();
-        dlp.download(urlDownload);
 
-        model.addAttribute("contenido", "download :: download");
-        return "layout";
-    }
+//    @PostMapping("/download")
+//    public String executeDownload(@RequestParam("urlDownload") String urlDownload ,Model model){
+//        DLP dlp = new DLP();
+//        dlp.download(urlDownload);
+//
+//        model.addAttribute("contenido", "download :: download");
+//        return "layout";
+//    }
 
 
 }

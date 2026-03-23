@@ -1,21 +1,53 @@
 package com.app.alpha.Clases;
 
+import com.app.alpha.Interfaces.Downloadeable;
 import com.sapher.youtubedl.YoutubeDL;
 import com.sapher.youtubedl.YoutubeDLException;
 import com.sapher.youtubedl.YoutubeDLRequest;
 import com.sapher.youtubedl.YoutubeDLResponse;
 import com.sapher.youtubedl.mapper.VideoFormat;
+import com.sapher.youtubedl.mapper.VideoInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
-public class DLP {
+@Component
+public class DLP implements Downloadeable {
+    public String directory = ""; //Aca va el lugar de descarga
 
-    @Async("downloadExecutor") // -> pool especifico para descargas (no esta creado el @Config, es probable que tire error)
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public DLP(){}
+
+    @Async("downloadExecutor")
+    public String info(String videoUrl){
+        try {
+            VideoInfo infoUrl = YoutubeDL.getVideoInfo(videoUrl);
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("url", infoUrl.webpageUrlBasename);
+            data.put("title", infoUrl.fulltitle);
+            data.put("thumbnail", infoUrl.thumbnail);
+            data.put("uploader", infoUrl.uploader);
+            data.put("description", infoUrl.description);
+
+            return objectMapper.writeValueAsString(data);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Async("downloadExecutor") // -> pool especifico para descargas
     public void download(String videoUrl){
-        String directory = "D:\\Download"; //Aca va el lugar de descarga
-        YoutubeDL.setExecutablePath("D:\\LIBS-PATH\\yt-dlp.exe"); //Path de yt-dlp.exe
+        YoutubeDL.setExecutablePath(""); //Path de yt-dlp.exe
 
         try{
             YoutubeDLRequest request = request(videoUrl, directory);
@@ -24,54 +56,13 @@ public class DLP {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-    }
-
-    private VideoFormat selectionFormat(List<VideoFormat> formats, Scanner sc){
-        VideoFormat formatSelection;
-
-        int opt = 0 ;
-        boolean f = false;
-        while (!f){
-            System.out.println("Seleccione resolucion: ");
-            for(int i=0; i <formats.toArray().length; i++){
-                VideoFormat format = formats.get(i);
-                if (format.acodec != null && format.height > 480){
-                    System.out.print(i+" - "+ formats.get(i).width+ "x"+formats.get(i).height+ " ");
-                    int kb = formats.get(i).filesize/ 1024; //yt-dlp devuelve el peso en bites.
-                    int mb = kb/ 1024;
-                    System.out.print(" "+mb+"mb");
-                    System.out.println();
-                }
-            }
-            System.out.println();
-            //opt = sc.nextInt();
-            f = true;
-        }
-        formatSelection = formats.get(opt); // Formato seleccionado
-
-        return formatSelection;
     }
 
     private YoutubeDLRequest request(String videoUrl, String directory){
 
         YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, directory);
-        request.setOption("ffmpeg-location", "D:\\LIBS-PATH\\ffmpeg.exe");
-
-        // 1. Simular un navegador moderno (Chrome en Windows 10/11)
-//        String chromeUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-//        request.setOption("user-agent", chromeUserAgent);
-
-        // 2. Agregar el Referer (la misma URL del video suele servir)
-        // Esto evita el error "403 Forbidden" en muchos sitios
+        request.setOption("ffmpeg-location", "D:\\LIBS-PATH\\ffmpeg.exe"); //ubicacion de ffmpeg.exe
         request.setOption("referer", videoUrl);
-
-        // 3. Opciones de sigilo adicionales
-        request.setOption("no-check-certificate"); // Salta errores de SSL si el sitio es viejo
-        request.setOption("geo-bypass");           // Intenta saltar bloqueos regionales
-
-
-
 
         request.setOption("ignore-errors");
         request.setOption("no-overwrites");
