@@ -5,41 +5,33 @@ import com.sapher.youtubedl.YoutubeDL;
 import com.sapher.youtubedl.YoutubeDLException;
 import com.sapher.youtubedl.YoutubeDLRequest;
 import com.sapher.youtubedl.YoutubeDLResponse;
-import com.sapher.youtubedl.mapper.VideoFormat;
 import com.sapher.youtubedl.mapper.VideoInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 
-@Component
+@Service
 public class DLP implements Downloadeable {
     public String directory = ""; //Aca va el lugar de descarga
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     public DLP(){}
 
     @Async("downloadExecutor")
-    public String info(String videoUrl){
+    public CompletableFuture<Map<String, Object>> info(String videoUrl){
         try {
+            YoutubeDL.setExecutablePath("D:\\LIBS-PATH\\yt-dlp.exe");
             VideoInfo infoUrl = YoutubeDL.getVideoInfo(videoUrl);
             Map<String, Object> data = new HashMap<>();
-
-            data.put("url", infoUrl.webpageUrlBasename);
+            data.put("url", infoUrl.webpageUrl);
             data.put("title", infoUrl.fulltitle);
             data.put("thumbnail", infoUrl.thumbnail);
             data.put("uploader", infoUrl.uploader);
             data.put("description", infoUrl.description);
 
-            return objectMapper.writeValueAsString(data);
+            return CompletableFuture.completedFuture(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -48,7 +40,6 @@ public class DLP implements Downloadeable {
     @Async("downloadExecutor") // -> pool especifico para descargas
     public void download(String videoUrl){
         YoutubeDL.setExecutablePath(""); //Path de yt-dlp.exe
-
         try{
             YoutubeDLRequest request = request(videoUrl, directory);
             response(request);
@@ -59,7 +50,6 @@ public class DLP implements Downloadeable {
     }
 
     private YoutubeDLRequest request(String videoUrl, String directory){
-
         YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, directory);
         request.setOption("ffmpeg-location", "D:\\LIBS-PATH\\ffmpeg.exe"); //ubicacion de ffmpeg.exe
         request.setOption("referer", videoUrl);
