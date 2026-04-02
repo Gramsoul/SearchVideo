@@ -20,12 +20,8 @@ public class JsonService {
     }
 
     @Bean
-    public InfoDTO leerDatosJson(){
-        try{
-            InputStream inputStream = new ClassPathResource("JSON/test.json").getInputStream();
-            return objectMapper.readValue(inputStream, InfoDTO.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public InfoDTO leerDatosJson() throws IOException {
+        InputStream inputStream = new ClassPathResource("JSON/test.json").getInputStream();
+        return objectMapper.readValue(inputStream, InfoDTO.class);
     }
 }
