@@ -29,6 +29,7 @@ public class DLPService implements Downloadeable {
             data.setThumbnail(infoUrl.thumbnail);
             data.setUploader(infoUrl.uploader);
             data.setDescription(infoUrl.description);
+            data.setFormats(infoUrl.formats);
 
             return CompletableFuture.completedFuture(data);
         } catch (YoutubeDLException e) {
