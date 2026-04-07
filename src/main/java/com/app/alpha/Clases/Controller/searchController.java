@@ -34,9 +34,14 @@ public class searchController {
         if (url == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("errorDTO");
         }
-        InfoDTO response = dlpService.infoUrl(url).get();//get porque es un completable future
-        //InfoDTO response = jsonService.leerDatosJson(); //JSON de testeo
+        //InfoDTO response = dlpService.infoUrl(url).get();//get porque es un completable future
+        InfoDTO response = jsonService.leerDatosJson(); //JSON de testeo
         return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/test")
+    public InfoDTO jsonTest() throws IOException {
+        return jsonService.leerDatosJson();
     }
 
 
