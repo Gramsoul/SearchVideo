@@ -16,8 +16,8 @@ public class CorsConfiguration {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:4200",
-                                "https://search-video-front.vercel.app",
-                                "http://search-video-front.vercel.app")
+                                "https://gramsearch.vercel.app",
+                                "http://gramsearch.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
