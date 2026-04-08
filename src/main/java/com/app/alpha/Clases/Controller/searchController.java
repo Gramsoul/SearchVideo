@@ -35,18 +35,18 @@ public class searchController {
         if (url == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("errorDTO");
         }
-        //InfoDTO response = dlpService.infoUrl(url).get();//get porque es un completable future
-        InfoDTO response = jsonService.leerDatosJson(); //JSON de testeo
+        InfoDTO response = dlpService.infoUrl(url).get();//get porque es un completable future
+        //InfoDTO response = jsonService.leerDatosJson(); //JSON de testeo
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/download")
     public ResponseEntity<?> download(
             @RequestParam String url,
-            @RequestParam String formatId,
-            @RequestParam String directory) {
+            @RequestParam String format_id,
+            @RequestParam String dir) {
         try {
-            dlpService.download(url, formatId, directory);
+            dlpService.download(url, format_id, dir);
             return ResponseEntity.status(200).build();
         } catch (Exception e) {
             return ResponseEntity.status(400).build();

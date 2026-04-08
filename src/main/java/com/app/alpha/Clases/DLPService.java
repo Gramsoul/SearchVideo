@@ -7,16 +7,19 @@ import com.sapher.youtubedl.YoutubeDLRequest;
 import com.sapher.youtubedl.YoutubeDLResponse;
 import com.sapher.youtubedl.mapper.VideoFormat;
 import com.sapher.youtubedl.mapper.VideoInfo;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-public class DLPService {
+public class DLPService{
     private List<VideoFormat> filterFormats(List<VideoFormat> formats) {
         Map<Integer, VideoFormat> filteredFormats = formats.stream()
                 .filter(f -> f.ext != null && f.ext.equalsIgnoreCase("mp4"))
@@ -57,24 +60,29 @@ public class DLPService {
         try {
             YoutubeDLRequest request = request(videoUrl, format, directory);
             YoutubeDL.execute(request);
-        } catch (YoutubeDLException e) {
+        } catch (YoutubeDLException | IOException e) {
             throw new YoutubeDLException(e);
         }
     }
 
-    private YoutubeDLRequest request(String videoUrl, String format, String directory) {
+    private YoutubeDLRequest request(String videoUrl, String format, String directory) throws IOException {
 
         YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, directory);
-        request.setOption("ffmpeg-location", "src/main/resources/bin/ffmpeg.exe"); //ubicacion de ffmpeg.exe
+
+        String ffmpegPath = new File("src/main/resources/bin/ffmpeg.exe").getAbsolutePath();
+
+        request.setOption("ffmpeg-location", ffmpegPath); //ubicacion de ffmpeg.exe
         request.setOption("referer", videoUrl);
         request.setOption("ignore-errors");
+        request.setOption("js-runtimes", "node");
+        request.setOption("no-overwrites", "");
 
         //actualmente de selecciona por defecto el mejor audio
-        String finalFormat = format + "bestaudio";
+        String finalFormat = format + "+bestaudio";
         request.setOption("format", finalFormat);
 
         request.setOption("merge-output-format", "mp4");
-        request.setOption("output", "%(title)s.%(ext)s");
+//        request.setOption("output", "%(title)s [%(id)s].%(ext)s");
         request.setOption("retries", 10);
 
         return request;
