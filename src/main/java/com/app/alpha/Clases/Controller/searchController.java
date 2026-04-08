@@ -41,9 +41,12 @@ public class searchController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<?> download(@RequestParam String url, @RequestParam String directory){
+    public ResponseEntity<?> download(
+            @RequestParam String url,
+            @RequestParam String formatId,
+            @RequestParam String directory) {
         try {
-            dlpService.download(url, directory);
+            dlpService.download(url, formatId, directory);
             return ResponseEntity.status(200).build();
         } catch (Exception e) {
             return ResponseEntity.status(400).build();

@@ -51,42 +51,33 @@ public class DLPService {
     }
 
     @Async("downloadExecutor") // -> pool especifico para descargas
-    public void download(String videoUrl, String directory) {
-        YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
+    public void download(String videoUrl, String format, String directory) throws YoutubeDLException {
 
+        YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
         try {
-            YoutubeDLRequest request = request(videoUrl, directory);
-            response(request);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            YoutubeDLRequest request = request(videoUrl, format, directory);
+            YoutubeDL.execute(request);
+        } catch (YoutubeDLException e) {
+            throw new YoutubeDLException(e);
         }
     }
 
-    private YoutubeDLRequest request(String videoUrl, String directory) {
+    private YoutubeDLRequest request(String videoUrl, String format, String directory) {
 
         YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, directory);
         request.setOption("ffmpeg-location", "src/main/resources/bin/ffmpeg.exe"); //ubicacion de ffmpeg.exe
         request.setOption("referer", videoUrl);
-
         request.setOption("ignore-errors");
-        request.setOption("no-overwrites");
-        request.setOption("format", "bestvideo+bestaudio/best");
+
+        //actualmente de selecciona por defecto el mejor audio
+        String finalFormat = format + "bestaudio";
+        request.setOption("format", finalFormat);
+
         request.setOption("merge-output-format", "mp4");
         request.setOption("output", "%(title)s.%(ext)s");
         request.setOption("retries", 10);
 
         return request;
-    }
-
-    private YoutubeDLResponse response(YoutubeDLRequest request) {
-        YoutubeDLResponse response;
-        try {
-            response = YoutubeDL.execute(request);
-        } catch (YoutubeDLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return response;
     }
 
 
