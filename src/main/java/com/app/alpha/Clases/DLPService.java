@@ -1,13 +1,13 @@
 package com.app.alpha.Clases;
 
 import com.app.alpha.Clases.DTO.InfoDTO;
-import com.app.alpha.Interfaces.Downloadeable;
 import com.sapher.youtubedl.YoutubeDL;
 import com.sapher.youtubedl.YoutubeDLException;
 import com.sapher.youtubedl.YoutubeDLRequest;
 import com.sapher.youtubedl.YoutubeDLResponse;
 import com.sapher.youtubedl.mapper.VideoFormat;
 import com.sapher.youtubedl.mapper.VideoInfo;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +16,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-public class DLPService implements Downloadeable {
-    public String directory = ""; //Aca va el lugar de descarga
-
+public class DLPService {
     private List<VideoFormat> filterFormats(List<VideoFormat> formats) {
         Map<Integer, VideoFormat> filteredFormats = formats.stream()
                 .filter(f -> f.ext != null && f.ext.equalsIgnoreCase("mp4"))
                 .filter(f -> List.of(144, 240, 360, 480, 720, 1080, 1440, 2160).contains(f.height))
                 .collect(Collectors.toMap(
-                        f-> f.height,
+                        f -> f.height,
                         f -> f,
-                        (a,b) -> a.filesize > b.filesize ? a : b
+                        (a, b) -> a.filesize > b.filesize ? a : b
                 ));
         return new ArrayList<>(filteredFormats.values());
     }
@@ -53,13 +51,12 @@ public class DLPService implements Downloadeable {
     }
 
     @Async("downloadExecutor") // -> pool especifico para descargas
-    public void download(String videoUrl) {
-        YoutubeDL.setExecutablePath(""); //Path de yt-dlp.exe
+    public void download(String videoUrl, String directory) {
+        YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
 
         try {
             YoutubeDLRequest request = request(videoUrl, directory);
             response(request);
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

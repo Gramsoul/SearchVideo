@@ -6,6 +6,7 @@ import com.app.alpha.Clases.DTO.InfoDTO;
 import com.app.alpha.Clases.JsonService;
 import com.sapher.youtubedl.YoutubeDLException;
 import jakarta.validation.constraints.NotNull;
+import jdk.jshell.Snippet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +40,14 @@ public class searchController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/test")
-    public InfoDTO jsonTest() throws IOException {
-        return jsonService.leerDatosJson();
+    @GetMapping("/download")
+    public ResponseEntity<?> download(@RequestParam String url, @RequestParam String directory){
+        try {
+            dlpService.download(url, directory);
+            return ResponseEntity.status(200).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(400).build();
+        }
     }
 
 
