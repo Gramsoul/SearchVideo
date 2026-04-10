@@ -4,16 +4,15 @@ import com.app.alpha.Clases.DLPService;
 
 import com.app.alpha.Clases.DTO.InfoDTO;
 import com.app.alpha.Clases.JsonService;
+import com.app.alpha.Exceptions.ErrorHandlers.ErrorDTO;
 import com.sapher.youtubedl.YoutubeDLException;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jdk.jshell.Snippet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -29,28 +28,20 @@ public class searchController {
         this.jsonService = jsonService;
     }
 
-
     @GetMapping("/info")
-    public ResponseEntity<?> searchResponse(@RequestParam String url) throws YoutubeDLException, IOException, ExecutionException, InterruptedException { //volver a cambiar la respuesta a CompletableFuture
-        if (url == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("errorDTO");
-        }
-        InfoDTO response = dlpService.infoUrl(url).get();//get porque es un completable future
-        //InfoDTO response = jsonService.leerDatosJson(); //JSON de testeo
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<InfoDTO> searchResponse(@NotBlank @RequestParam String url)
+            throws YoutubeDLException, IOException {
+
+        //return jsonService.leerDatosJson();
+        return ResponseEntity.ok().body(dlpService.infoUrl(url));
     }
 
     @GetMapping("/download")
-    public ResponseEntity<?> download(
+    public ResponseEntity<InfoDTO> download(
             @RequestParam String url,
-            @RequestParam String format_id,
-            @RequestParam String dir) {
-        try {
-            dlpService.download(url, format_id, dir);
-            return ResponseEntity.status(200).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(400).build();
-        }
+            @RequestParam String format_id) {
+
+        return ResponseEntity.ok().build();
     }
 
 

@@ -32,9 +32,9 @@ public class DLPService{
         return new ArrayList<>(filteredFormats.values());
     }
 
-    @Async
-    public CompletableFuture<InfoDTO> infoUrl(String videoUrl) throws YoutubeDLException {
+    public InfoDTO infoUrl(String videoUrl) throws YoutubeDLException {
         try {
+
             YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
 
             VideoInfo infoUrl = YoutubeDL.getVideoInfo(videoUrl);
@@ -47,7 +47,7 @@ public class DLPService{
             data.setDescription(infoUrl.description);
             data.setFormats(filterFormats(infoUrl.formats));
 
-            return CompletableFuture.completedFuture(data);
+            return data;
         } catch (YoutubeDLException e) {
             throw new YoutubeDLException(e);
         }
@@ -58,16 +58,21 @@ public class DLPService{
 
         YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
         try {
-            YoutubeDLRequest request = request(videoUrl, format, directory);
+            YoutubeDLRequest request = request(videoUrl, format);
             YoutubeDL.execute(request);
         } catch (YoutubeDLException | IOException e) {
             throw new YoutubeDLException(e);
         }
     }
 
-    private YoutubeDLRequest request(String videoUrl, String format, String directory) throws IOException {
+    public void downloadStream(String url, String format) throws IOException {
+        File tempFile = File.createTempFile("video_", ".mp4");
 
-        YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, directory);
+    }
+
+    private YoutubeDLRequest request(String videoUrl, String format) throws IOException {
+
+        YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
 
         String ffmpegPath = new File("src/main/resources/bin/ffmpeg.exe").getAbsolutePath();
 
@@ -82,7 +87,6 @@ public class DLPService{
         request.setOption("format", finalFormat);
 
         request.setOption("merge-output-format", "mp4");
-//        request.setOption("output", "%(title)s [%(id)s].%(ext)s");
         request.setOption("retries", 10);
 
         return request;
