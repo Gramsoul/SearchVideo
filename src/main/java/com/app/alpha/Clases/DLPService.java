@@ -7,6 +7,7 @@ import com.sapher.youtubedl.YoutubeDLRequest;
 import com.sapher.youtubedl.YoutubeDLResponse;
 import com.sapher.youtubedl.mapper.VideoFormat;
 import com.sapher.youtubedl.mapper.VideoInfo;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -36,6 +37,7 @@ public class DLPService{
         try {
 
             YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
+            //subir el yt-dlp/ ffmpeg.exe a railways y llamarlo desde ahi
 
             VideoInfo infoUrl = YoutubeDL.getVideoInfo(videoUrl);
             InfoDTO data = new InfoDTO();
@@ -54,7 +56,7 @@ public class DLPService{
     }
 
     @Async("downloadExecutor") // -> pool especifico para descargas
-    public void download(String videoUrl, String format, String directory) throws YoutubeDLException {
+    public void download(@NotBlank String videoUrl, @NotBlank String format) throws YoutubeDLException {
 
         YoutubeDL.setExecutablePath("src/main/resources/bin/yt-dlp.exe"); //Path de yt-dlp.exe
         try {
@@ -65,12 +67,7 @@ public class DLPService{
         }
     }
 
-    public void downloadStream(String url, String format) throws IOException {
-        File tempFile = File.createTempFile("video_", ".mp4");
-
-    }
-
-    private YoutubeDLRequest request(String videoUrl, String format) throws IOException {
+    private YoutubeDLRequest request(@NotBlank String videoUrl, @NotBlank String format) throws IOException {
 
         YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
 
@@ -92,5 +89,9 @@ public class DLPService{
         return request;
     }
 
+    public void downloadStream(String url, String format) throws IOException {
+        File tempFile = File.createTempFile("video_", ".mp4");
+
+    }
 
 }

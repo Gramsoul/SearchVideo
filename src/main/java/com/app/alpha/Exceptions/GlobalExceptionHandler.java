@@ -23,8 +23,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(YoutubeDLException.class)
     public ResponseEntity<ErrorDTO> test(YoutubeDLException ex, WebRequest request) {
         ErrorDTO e = new ErrorDTO("Fallo en yt-dlp", request.getDescription(false));
-        System.out.println(e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
     }
 
 }

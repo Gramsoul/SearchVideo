@@ -11,7 +11,7 @@ import java.util.List;
 public class InfoDTO {
     @NotBlank
     private String url;
-    @NotBlank
+    @NotNull
     private String title;
     private String thumbnail;
     private String uploader;
