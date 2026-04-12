@@ -68,7 +68,7 @@ public class DLPService {
     private List<VideoFormat> filterFormats(List<VideoFormat> formats) {
         Map<Integer, VideoFormat> filteredFormats = formats.stream()
                 .filter(f -> f.ext != null && f.ext.equalsIgnoreCase("mp4"))
-                .filter(f -> List.of(144, 240, 360, 480, 720, 1080, 1440, 2160).contains(f.height))
+                .filter(f -> List.of(144, 240, 360, 480, 720).contains(f.height)) //se elimino a partir de 720 porque streams no soporta unir con ffmpeg
                 .collect(Collectors.toMap(
                         f -> f.height,
                         f -> f,
