@@ -4,20 +4,13 @@ import com.app.alpha.Clases.DLPService;
 
 import com.app.alpha.Clases.DTO.InfoDTO;
 import com.app.alpha.Clases.JsonService;
-import com.app.alpha.Exceptions.ErrorHandlers.ErrorDTO;
 import com.sapher.youtubedl.YoutubeDLException;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jdk.jshell.Snippet;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 @RestController
 public class searchController {
     private final DLPService dlpService;
@@ -37,11 +30,11 @@ public class searchController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<InfoDTO> download(
-            @RequestParam String url,
-            @RequestParam String format_id) {
+    public ResponseEntity<StreamingResponseBody> download(
+            @NotBlank @RequestParam String url,
+            @NotBlank @RequestParam String format_id) {
 
-        return ResponseEntity.ok().build();
+        return dlpService.downloadStream(url, format_id);
     }
 
 

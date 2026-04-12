@@ -21,9 +21,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(YoutubeDLException.class)
-    public ResponseEntity<ErrorDTO> test(YoutubeDLException ex, WebRequest request) {
+    public ResponseEntity<ErrorDTO> youtubeDL(YoutubeDLException ex, WebRequest request) {
         ErrorDTO e = new ErrorDTO("Fallo en yt-dlp", request.getDescription(false));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
+    }
+
+    @ExceptionHandler(StreamFailException.class)
+    public ResponseEntity<ErrorDTO> StreamFail(StreamFailException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ErrorDTO("Fallo en la creacion del stream", request.getDescription(false))
+        );
     }
 
 }
